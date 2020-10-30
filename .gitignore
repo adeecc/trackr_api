@@ -1,7 +1,12 @@
+# Workflow
 env/
 .vscode
 .idea
 
+# Secrets
+.env
+
+# Django
 *.egg-info
 *.pot
 *.py[co]
