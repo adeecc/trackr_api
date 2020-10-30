@@ -1,4 +1,7 @@
+import jwt
+
 from django.contrib.sites.shortcuts import get_current_site
+from django.conf import settings
 from django.urls import reverse
 
 from rest_framework import generics, status
@@ -6,6 +9,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from rest_framework_simplejwt.tokens import RefreshToken
+
 
 from .serializers import RegisterSerializer, GoogleSocialAuthSerializer
 from .models import User
@@ -47,7 +51,26 @@ class RegisterView(generics.GenericAPIView):
 
 class VerifyEmail(generics.GenericAPIView):
     def get(self, request):
-        pass
+        token = request.GET.get('token')
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY)
+            user = User.objects.get(id=payload['user_id'])
+            
+            if not user.is_verified:
+                user.is_verified = True
+                user.save()
+
+            return Response({'email': 'Successfully Activated'}, status=status.HTTP_200_OK)
+
+        except jwt.ExpiredSignatureError:
+            return Response({'error': 'Activation Link Expired'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        except jwt.DecodeError:
+            return Response({'error': 'Invalid Token'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        except:
+            return Response({'error': 'Unknown Error Occured'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class GoogleSocialAuthView(GenericAPIView):
