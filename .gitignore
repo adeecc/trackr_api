@@ -15,6 +15,7 @@ env/
 __pycache__
 MANIFEST
 dist/
+migrations/
 docs/_build/
 docs/locale/
 node_modules/
