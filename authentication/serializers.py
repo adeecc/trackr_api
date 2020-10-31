@@ -1,12 +1,13 @@
 # from django.db.models import fields
 from django.db.models.expressions import Value
 from django.http import request
+from django.contrib import auth
+
 from rest_framework import serializers
 
 from google.oauth2 import id_token
 from google.auth.transport import Request, requests
-from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.serializers import SerializerMetaclass
+# from rest_framework.serializers import SerializerMetaclass
 
 from .models import User
 from .register import register_social_user
@@ -41,6 +42,52 @@ class RegisterSerializer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data)
 
 
+class EmailVerificationSerializer(serializers.ModelSerializer):
+    token = serializers.CharField(max_length=555)
+
+    class Meta:
+        model = User
+        fields = ['token']
+
+
+class LoginSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(max_length=255)
+    username = serializers.CharField(max_length=255, read_only=True)
+    password = serializers.CharField(
+        max_length=MAX_PASSWORD_LENGTH, min_length=MIN_PASSWORD_LENGTH, write_only=True)
+    tokens = serializers.CharField(max_length=255, read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['email', 'username', 'password', 'tokens']
+
+    def validate(self, attrs):
+        email = attrs.get('email', '')
+        password = attrs.get('password', '')
+
+        user = auth.authenticate(email=email, password=password)
+
+        if not user:
+            raise serializers.AuthenticationFailed(
+                'Invalid Credentials, try again.'
+            )
+
+        if not user.is_active:
+            raise serializers.AuthenticationFailed(
+                'Account Disabled. Contact admin'
+            )
+
+        if not user.is_verified:
+            raise serializers.AuthenticationFailed(
+                'Email Not verified')
+
+        return {
+            'email': user.email,
+            'username': user.username,
+            'tokens': user.tokens(),
+        }
+
+        return super().validate(attrs)
 
 
 class GoogleSocialAuthSerializer(serializers.Serializer):
@@ -51,9 +98,10 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
 
     def validate_auth_token(self, auth_token):
         try:
-            idinfo = id_token.verify_oauth2_token(auth_token, requests.Request(), self.GOOGLE_CLIENT_ID)
+            idinfo = id_token.verify_oauth2_token(
+                auth_token, requests.Request(), self.GOOGLE_CLIENT_ID)
         except ValueError:
-            raise AuthenticationFailed(
+            raise serializers.AuthenticationFailed(
                 'Invalid Token. Try again'
             )
 

@@ -1,3 +1,4 @@
+from django.http import request
 import jwt
 
 from django.contrib.sites.shortcuts import get_current_site
@@ -11,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-from .serializers import RegisterSerializer, GoogleSocialAuthSerializer
+from .serializers import RegisterSerializer, EmailVerificationSerializer, LoginSerializer, GoogleSocialAuthSerializer
 from .models import User
 
 from .utils import Util
@@ -50,6 +51,8 @@ class RegisterView(generics.GenericAPIView):
 
 
 class VerifyEmail(generics.GenericAPIView):
+    serializer_class = EmailVerificationSerializer
+
     def get(self, request):
         token = request.GET.get('token')
         try:
@@ -71,6 +74,15 @@ class VerifyEmail(generics.GenericAPIView):
         except:
             return Response({'error': 'Unknown Error Occured'}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class LoginAPIView(generics.GenericAPIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GoogleSocialAuthView(GenericAPIView):
