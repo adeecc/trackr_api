@@ -24,11 +24,14 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password')
+        fields = ('email', 'username', 'password',
+                  'phone_number', 'profession')
 
     def validate(self, attrs):
         email = attrs.get('email', '')
         username = attrs.get('username', '')
+        phone_number = attrs.get('phone_number', '0000000000')
+        profession = attrs.get('profession', 'Unemployed')
 
         # TODO: Validate Password using regexs
 
@@ -59,7 +62,8 @@ class LoginSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'password', 'tokens']
+        fields = ['email', 'username', 'password',
+                  'phone_number', 'profession', 'tokens']
 
     def validate(self, attrs):
         email = attrs.get('email', '')
