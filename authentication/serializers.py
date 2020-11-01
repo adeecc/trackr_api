@@ -1,4 +1,5 @@
-# from django.db.models import fields
+import os
+
 from django.db.models.expressions import Value
 from django.http import request
 from django.contrib import auth
@@ -7,7 +8,6 @@ from rest_framework import serializers
 
 from google.oauth2 import id_token
 from google.auth.transport import Request, requests
-# from rest_framework.serializers import SerializerMetaclass
 
 from .models import User
 from .register import register_social_user
@@ -93,8 +93,7 @@ class LoginSerializer(serializers.ModelSerializer):
 class GoogleSocialAuthSerializer(serializers.Serializer):
     token = serializers.CharField()
 
-    GOOGLE_CLIENT_ID = "145123241245-qeld4bjknovdn7b4ppag2m5so0t6e9lm.apps.googleusercontent.com"
-    # GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 
     def validate_auth_token(self, auth_token):
         try:

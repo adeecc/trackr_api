@@ -1,8 +1,10 @@
+import re
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, UserManager
-
+from django.core.validators import RegexValidator
 
 from rest_framework_simplejwt.tokens import RefreshToken
+
 
 class UserManager(BaseUserManager):
 
@@ -33,12 +35,18 @@ class UserManager(BaseUserManager):
 
 
 AUTH_PROVIDERS = {"facebook": "facebook",
-                "google": "google", "email": "emails"}
+                  "google": "google", "email": "emails"}
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+
+    phone_number_regex = RegexValidator(regex=r'^\+?[0-9]{9,15}$')
+
     username = models.CharField(max_length=255, unique=True, db_index=True)
     email = models.CharField(max_length=255, unique=True, db_index=True)
+    phone_number = models.CharField(max_length=15, validators=[
+                                    phone_number_regex], default='0000000000')
+    profession = models.CharField(max_length=255, default="Unemployed")
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -48,8 +56,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=255, blank=False, null=False, default=AUTH_PROVIDERS.get('email')
     )
 
-    # TODO: Add Phone Number and Profession Fields
-    # TODO: Verify Phone Number and Mail via OTP
     # TODO: Validate username using regex (On Frontend)
 
     USERNAME_FIELD = 'email'
