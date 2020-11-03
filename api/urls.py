@@ -44,4 +44,6 @@ urlpatterns = [
                                        cache_timeout=0), name='schema-redoc'),
     path('api/v1/core/', include('shiftr.urls')),
     path('api/v1/auth/', include('authentication.urls')),
+
+    path('api/v1/todo/', include('todo.urls')),
 ]
