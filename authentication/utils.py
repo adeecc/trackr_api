@@ -9,7 +9,4 @@ class Util:
         email = EmailMessage(to=data["to_email"],
             subject=data["email_subject"], body=data["email_body"])
 
-        print(f"Mailing to {os.environ.get('EMAIL_HOST_USER')}")
-        print(f"Password {os.environ.get('EMAIL_HOST_PASSWORD')}")
-
         email.send()
