@@ -14,6 +14,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .serializers import RegisterSerializer, EmailVerificationSerializer, LoginSerializer, GoogleSocialAuthSerializer
 from .models import User
+from .renderers import UserRenderer
 
 from .utils import Util
 
@@ -21,6 +22,7 @@ from .utils import Util
 class RegisterView(generics.GenericAPIView):
 
     serializer_class = RegisterSerializer
+    renderer_classes = (UserRenderer,)
 
     def post(self, request):
         user = request.data
@@ -51,14 +53,16 @@ class RegisterView(generics.GenericAPIView):
 
 
 class VerifyEmail(generics.GenericAPIView):
+
     serializer_class = EmailVerificationSerializer
+    renderer_classes = (UserRenderer,)
 
     def get(self, request):
         token = request.GET.get('token')
         try:
             payload = jwt.decode(token, settings.SECRET_KEY)
             user = User.objects.get(id=payload['user_id'])
-            
+
             if not user.is_verified:
                 user.is_verified = True
                 user.save()
@@ -67,26 +71,31 @@ class VerifyEmail(generics.GenericAPIView):
 
         except jwt.ExpiredSignatureError:
             return Response({'error': 'Activation Link Expired'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         except jwt.DecodeError:
             return Response({'error': 'Invalid Token'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         except:
             return Response({'error': 'Unknown Error Occured'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginAPIView(generics.GenericAPIView):
+
     serializer_class = LoginSerializer
+    renderer_classes = (UserRenderer,)
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
+        # TODO: Handle Exceptions of invalid credentials - Authentication Failed
         serializer.is_valid(raise_exception=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GoogleSocialAuthView(GenericAPIView):
+
     serializer_class = GoogleSocialAuthSerializer
+    renderer_classes = (UserRenderer,)
 
     def post(self, request):
         """
@@ -94,6 +103,6 @@ class GoogleSocialAuthView(GenericAPIView):
 
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = (serializer.validated_data['token'])
+        data = (serializer.validated_data)
 
         return Response(data, status=status.HTTP_200_OK)
