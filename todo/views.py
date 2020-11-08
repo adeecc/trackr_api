@@ -4,7 +4,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework import permissions
 
 from .models import Todo, TodoItem
-from .serializers import TodoSerializer
+from .serializers import TodoSerializer, TodoItemSerializer
 from .permissions import IsOwner
 
 
@@ -28,3 +28,21 @@ class TodoDetailAPIView(RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return self.queryset.filter(owner=self.request.user)
+
+
+class TodoItemListAPIView(ListCreateAPIView):
+    serializer_class = TodoItemSerializer
+    queryset = TodoItem.objects.all()
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_queryset(self):
+        return TodoItem.objects.filter(todo_list__owner = self.request.user)
+
+class TodoItemDetailAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = TodoItemSerializer
+    queryset = TodoItem.objects.all()
+    permission_classes = (permissions.IsAuthenticated, )
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return self.queryset.filter(todo_list__owner = self.request.user)
