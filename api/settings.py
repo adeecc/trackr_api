@@ -27,7 +27,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'c5@^y0+hdlnsn2#!-&f=_b@i563(i@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".ngrok.io"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".ngrok.io", "shiftrio.herokuapp.com"]
 
 AUTH_USER_MODEL = 'authentication.User'
 
