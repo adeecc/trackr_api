@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'shiftr',
     'authentication',
     'todo',
+    'inventorymanagement',
 ]
 
 SWAGGER_SETTINGS = {
