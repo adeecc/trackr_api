@@ -11,7 +11,7 @@ class UserRenderer(renderers.JSONRenderer):
 
         if 'ErrorDetail' in str(data):
             response = json.dumps({
-                'errors': data
+                'errors': data["detail"]
             })
 
         else:

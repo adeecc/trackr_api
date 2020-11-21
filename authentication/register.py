@@ -18,11 +18,9 @@ def generate_username(name):
         return generate_username(random_username)
 
 
-# TODO: Get Phone Numner and Professions fields
-def register_social_user(provider, user_id, email, name):
+def register_social_user(provider, user_id, email, name, phone_number, profession):
     filtered_user_by_email = User.objects.filter(email=email)
     social_password = os.environ.get('SOCIAL_SECRET')
-
 
     if filtered_user_by_email.exists():
         if provider == filtered_user_by_email[0].auth_provider:
@@ -45,7 +43,14 @@ def register_social_user(provider, user_id, email, name):
             'password': social_password
         }
 
-        user = User.objects.create_user(username=generate_username(name), email=email, password=social_password)
+        user = User.objects.create_user(
+            username=generate_username(name),
+            email=email,
+            password=social_password,
+            phone_number=phone_number,
+            profession=profession
+        )
+        
         user.is_verified = True
         user.auth_provider = provider
         user.save()

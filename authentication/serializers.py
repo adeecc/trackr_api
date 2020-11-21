@@ -103,13 +103,16 @@ class LoginSerializer(serializers.ModelSerializer):
 
 class GoogleSocialAuthSerializer(serializers.Serializer):
     token = serializers.CharField()
+    phone_number = serializers.RegexField(
+        regex=r'^\+?[0-9]{9,15}$', max_length=15)
+    profession = serializers.CharField()
 
     GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 
-    def validate_token(self, auth_token):
+    def validate(self, data):
         try:
             idinfo = id_token.verify_oauth2_token(
-                auth_token, requests.Request(), self.GOOGLE_CLIENT_ID)
+                data["token"], requests.Request(), self.GOOGLE_CLIENT_ID)
         except ValueError:
             raise AuthenticationFailed(
                 'Invalid Token. Try again'
@@ -118,8 +121,13 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
         userid = idinfo['sub']
         email = idinfo['email']
         name = idinfo['name']
-        provider='google'
+        provider = 'google'
 
         return register_social_user(
-            provider=provider, user_id=userid, email=email, name=name
+            provider=provider, 
+            user_id=userid, 
+            email=email, 
+            name=name, 
+            phone_number=data["phone_number"], 
+            profession=data["profession"]
         )
