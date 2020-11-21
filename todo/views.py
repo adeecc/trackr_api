@@ -5,11 +5,13 @@ from rest_framework import permissions
 
 from .models import Todo, TodoItem
 from .serializers import TodoSerializer, TodoItemSerializer
+from .renderers import TodoRenderer
 from .permissions import IsOwner
 
 
 class TodoListAPIView(ListCreateAPIView):
     serializer_class = TodoSerializer
+    renderer_classes = (TodoRenderer,)
     queryset = Todo.objects.all()
     permission_classes = (permissions.IsAuthenticated, )
 
@@ -22,6 +24,7 @@ class TodoListAPIView(ListCreateAPIView):
 
 class TodoDetailAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = TodoSerializer
+    renderer_classes = (TodoRenderer,)
     queryset = Todo.objects.all()
     permission_classes = (permissions.IsAuthenticated, IsOwner, )
     lookup_field = 'id'
@@ -32,6 +35,7 @@ class TodoDetailAPIView(RetrieveUpdateDestroyAPIView):
 
 class TodoItemListAPIView(ListCreateAPIView):
     serializer_class = TodoItemSerializer
+    renderer_classes = (TodoRenderer,)
     queryset = TodoItem.objects.all()
     permission_classes = (permissions.IsAuthenticated, )
 
@@ -40,6 +44,7 @@ class TodoItemListAPIView(ListCreateAPIView):
 
 class TodoItemDetailAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = TodoItemSerializer
+    renderer_classes = (TodoRenderer,)
     queryset = TodoItem.objects.all()
     permission_classes = (permissions.IsAuthenticated, )
     lookup_field = 'id'
