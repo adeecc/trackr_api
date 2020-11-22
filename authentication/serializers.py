@@ -1,8 +1,7 @@
 import os
 
-from django.db.models.expressions import Value
-from django.http import request
 from django.contrib import auth
+from django.db.models import fields
 
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
@@ -16,6 +15,19 @@ from .register import register_social_user
 
 MAX_PASSWORD_LENGTH = 68
 MIN_PASSWORD_LENGTH = 8
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = [
+            'username',
+            'email',
+            'phone_number',
+            'profession',
+            'auth_provider']
+
 
 
 class RegisterSerializer(serializers.ModelSerializer):

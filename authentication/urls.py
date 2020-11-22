@@ -4,9 +4,10 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from .views import RegisterView, VerifyEmail, LoginAPIView, GoogleSocialAuthView
+from .views import ProfileView, RegisterView, VerifyEmail, LoginAPIView, GoogleSocialAuthView
 
 urlpatterns = [
+    path('profile', ProfileView.as_view(), name='profile'),
     path('register/', RegisterView.as_view(), name='register'),
     path('email-verify/', VerifyEmail.as_view(), name="email-verify"),
     path('login/', LoginAPIView.as_view(), name='login'),

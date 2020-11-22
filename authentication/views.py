@@ -5,18 +5,28 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from django.urls import reverse
 
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-from .serializers import RegisterSerializer, EmailVerificationSerializer, LoginSerializer, GoogleSocialAuthSerializer
+from .serializers import UserSerializer, RegisterSerializer, EmailVerificationSerializer, LoginSerializer, GoogleSocialAuthSerializer, serializers
 from .models import User
 from .renderers import UserRenderer
 
 from .utils import Util
+
+
+class ProfileView(generics.ListAPIView):
+    serializer_class = UserSerializer
+    renderer_classes = (UserRenderer, )
+    queryset = User.objects.all()
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        return self.queryset.filter(id=self.request.user.id)
 
 
 class RegisterView(generics.GenericAPIView):
