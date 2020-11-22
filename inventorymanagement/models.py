@@ -16,7 +16,7 @@ class InventoryItem(models.Model):
     category = models.CharField(max_length=255)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=10, decimal_places=3)
-    unit = models.CharField(max_length=2, choices=Units.choices, default=Units.NIL)
+    unit = models.CharField(max_length=3, choices=Units.choices, default=Units.NIL)
 
     def __str__(self) -> str:
         return self.name
