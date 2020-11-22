@@ -24,9 +24,9 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Authentication Backend",
-        default_version='v1',
-        description="Authentication End Points for the shiftr api",
+        title="Backend for the shiftr app",
+        default_version='v2',
+        description="API End Points for the shiftr app",
         terms_of_service=None,
         contact=openapi.Contact(email='shiftrio@gmail.com'),
         license=openapi.License(name="Private Property")
@@ -46,4 +46,5 @@ urlpatterns = [
     path('api/v1/auth/', include('authentication.urls')),
 
     path('api/v1/todo/', include('todo.urls')),
+    path('api/v1/inventory/', include('inventorymanagement.urls')),
 ]
