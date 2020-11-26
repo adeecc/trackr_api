@@ -1,3 +1,4 @@
+import re
 from django.http import request
 import jwt
 
@@ -6,13 +7,14 @@ from django.conf import settings
 from django.urls import reverse
 
 from rest_framework import generics, status, permissions
+from rest_framework import serializers
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-from .serializers import UserSerializer, RegisterSerializer, EmailVerificationSerializer, LoginSerializer, GoogleSocialAuthSerializer, serializers
+from .serializers import UserSerializer, RegisterSerializer, EmailVerificationSerializer, LoginSerializer, GoogleSocialAuthSerializer, DashboardSerializer
 from .models import User
 from .renderers import UserRenderer
 
@@ -115,5 +117,24 @@ class GoogleSocialAuthView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         data = (serializer.validated_data)
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class DashboardView(GenericAPIView):
+    serializer_class = DashboardSerializer
+    renderer_classes = (UserRenderer,)
+
+    def get(self, request):
+
+        serializer = self.serializer_class(data={
+            "username": request.user.username,
+            "email": request.user.email,
+            "profession": request.user.profession
+        })
+        serializer.is_valid(raise_exception=True)
+
+        data = serializer.validated_data
+        print(data)
 
         return Response(data, status=status.HTTP_200_OK)

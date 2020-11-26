@@ -8,9 +8,13 @@ from rest_framework.exceptions import AuthenticationFailed
 
 from google.oauth2 import id_token
 from google.auth.transport import requests
+from rest_framework.serializers import Serializer
 
 from .models import User
 from .register import register_social_user
+
+from todo.models import Todo, TodoItem
+from inventorymanagement.models import InventoryItem
 
 
 MAX_PASSWORD_LENGTH = 68
@@ -27,7 +31,6 @@ class UserSerializer(serializers.ModelSerializer):
             'phone_number',
             'profession',
             'auth_provider']
-
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -136,10 +139,37 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
         provider = 'google'
 
         return register_social_user(
-            provider=provider, 
-            user_id=userid, 
-            email=email, 
-            name=name, 
-            phone_number=data["phone_number"], 
+            provider=provider,
+            user_id=userid,
+            email=email,
+            name=name,
+            phone_number=data["phone_number"],
             profession=data["profession"]
         )
+
+
+class DashboardSerializer(serializers.Serializer):
+
+    username = serializers.CharField()
+    email = serializers.EmailField()
+    profession = serializers.CharField()
+
+    def validate(self, data):
+
+        username = data["username"]
+        email = data["email"]
+        profession = data["profession"]
+
+        user = User.objects.get(email=email)
+        completed_todo_item = TodoItem.objects.filter(todo_list__owner=user, done=True).count()
+        pending_todo_item = TodoItem.objects.filter(todo_list__owner=user, done=False).count()
+        inventory = InventoryItem.objects.filter(owner=user).count()
+
+        return {
+            "username": username,
+            "email": email,
+            "profession": profession,
+            "completed_todo": completed_todo_item,
+            "pending_todo": pending_todo_item,
+            "inventory": inventory,
+        }
