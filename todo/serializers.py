@@ -14,4 +14,7 @@ class TodoItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TodoItem
-        fields = ['id', 'todo', 'todo_list', 'done', 'priority', 'deadline']
+        fields = ['id', 'todo', 'todo_list', 'done', 'deadline', 'priority']
+
+    def create(self, validated_data):
+        return TodoItem.objects.create_todoitem(**validated_data)

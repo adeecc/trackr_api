@@ -1,6 +1,11 @@
+from datetime import datetime, timedelta
 from django.db import models
+from django.db.models.manager import BaseManager
 
 from authentication.models import User
+
+from .tasks import send_email
+
 
 class ColorField(models.CharField):
     def __init__(self, *args, **kwargs):
@@ -19,6 +24,33 @@ class Todo(models.Model):
         return self.name
 
 
+class TodoItemManager(models.Manager):
+    def create_todoitem(self, todo, todo_list, done, deadline, priority):
+        todoitem = self.model(
+            todo=todo,
+            todo_list=todo_list,
+            done=done,
+            deadline=deadline,
+            priority=priority,
+        )
+
+        todoitem.save()
+        username = todoitem.todo_list.owner.username
+        formatted_deadline = deadline.strftime('%a, %d %b %Y %H:%M')
+        print(username)
+
+        data = {}
+
+        data["to"] = [todoitem.todo_list.owner.email]
+        data["subject"] = f"Reminder for Event: {todo} @ {formatted_deadline}"
+        data["body"] = f"Dear {username},\nYou have a task scheduled at {formatted_deadline}: {todo} ({todo_list}).\nMake sure to attend and update on the app!\nShiftr"
+
+        eta = deadline - timedelta(minutes=10)
+        send_email.apply_async(eta=eta, kwargs={'data': data})
+
+        return todoitem
+
+
 class TodoItem(models.Model):
 
     class Priority(models.TextChoices):
@@ -35,6 +67,7 @@ class TodoItem(models.Model):
     priority = models.CharField(
         max_length=3, choices=Priority.choices, default=Priority.LOW)
 
+    objects = TodoItemManager()
 
     def __str__(self) -> str:
         return self.todo
