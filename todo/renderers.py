@@ -10,8 +10,9 @@ class TodoRenderer(renderers.JSONRenderer):
         response = ''
 
         if 'ErrorDetail' in str(data):
+            key = list(data.keys())[0]
             response = json.dumps({
-                'errors': data["detail"]
+                'errors': f"Error ({key}): " + data[key][0]
             })
 
         else:
