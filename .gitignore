@@ -6,6 +6,9 @@ env/
 # Secrets
 .env
 
+# Redis
+*.rdb
+
 # Django
 *.egg-info
 *.pot
