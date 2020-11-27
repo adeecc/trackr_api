@@ -71,3 +71,10 @@ class TodoItem(models.Model):
 
     def __str__(self) -> str:
         return self.todo
+
+
+class Document(models.Model):
+    doc = models.FileField(upload_to='uploads/todo/') # EXTRMEMLY UNSECURE!
+    todo_item = models.ForeignKey(TodoItem, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Todo, TodoItem
+from .models import Todo, TodoItem, Document
 
 
 class TodoSerializer(serializers.ModelSerializer):
@@ -18,3 +18,9 @@ class TodoItemSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return TodoItem.objects.create_todoitem(**validated_data)
+
+
+class DocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Document
+        fields = ['id', 'doc', 'todo_item']
