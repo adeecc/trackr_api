@@ -74,3 +74,18 @@ class DocumentListAPIView(ListCreateAPIView):
 
     def get_queryset(self):
         return Document.objects.filter(todo_item__todo_list__owner=self.request.user)
+
+
+class DocumentDetailAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = DocumentSerializer
+    parser_classes = [MultiPartParser]
+    queryset = Document.objects.all()
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_queryset(self):
+        return Document.objects.filter(todo_item__todo_list__owner=self.request.user)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_200_OK)
