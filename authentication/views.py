@@ -104,7 +104,7 @@ class LoginAPIView(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class GoogleSocialAuthView(GenericAPIView):
+class GoogleSocialAuthView(generics.GenericAPIView):
 
     serializer_class = GoogleSocialAuthSerializer
     renderer_classes = (UserRenderer,)

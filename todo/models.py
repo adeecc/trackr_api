@@ -4,8 +4,6 @@ from django.db.models.manager import BaseManager
 
 from authentication.models import User
 
-from .tasks import send_email
-
 
 class ColorField(models.CharField):
     def __init__(self, *args, **kwargs):
@@ -35,18 +33,18 @@ class TodoItemManager(models.Manager):
         )
 
         todoitem.save()
-        username = todoitem.todo_list.owner.username
-        formatted_deadline = deadline.strftime('%a, %d %b %Y %H:%M')
-        print(username)
+        # username = todoitem.todo_list.owner.username
+        # formatted_deadline = deadline.strftime('%a, %d %b %Y %H:%M')
 
-        data = {}
+        # data = {}
 
-        data["to"] = [todoitem.todo_list.owner.email]
-        data["subject"] = f"Reminder for Event: {todo} @ {formatted_deadline}"
-        data["body"] = f"Dear {username},\nYou have a task scheduled at {formatted_deadline}: {todo} ({todo_list}).\nMake sure to attend and update on the app!\nShiftr"
+        # data["todo_item"] = todoitem.id
+        # data["to"] = [todoitem.todo_list.owner.email]
+        # data["subject"] = f"Reminder for Event: {todo} @ {formatted_deadline}"
+        # data["body"] = f"Dear {username},\nYou have a task scheduled at {formatted_deadline}: {todo} ({todo_list}).\nMake sure to attend and update on the app!\nShiftr"
 
-        eta = deadline - timedelta(minutes=10)
-        send_email.apply_async(eta=eta, kwargs={'data': data})
+        # eta = deadline - timedelta(minutes=10)
+        # send_email.apply_async(eta=eta, kwargs={'data': data})
 
         return todoitem
 
